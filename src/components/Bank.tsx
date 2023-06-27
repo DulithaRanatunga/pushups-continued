@@ -1,5 +1,11 @@
 import { Button, Typography, Box } from '@mui/material';
 import { useState } from 'react';
+import {
+    CircularInput,
+    CircularTrack,
+    CircularProgress,
+    CircularThumb,
+  } from "react-circular-input"; 
 
 function Bank() {    
 //   const classes = useStyles();
@@ -35,7 +41,21 @@ function Bank() {
   return (
     <Box>
        <Typography variant="h3"> Todays Goal: 100</Typography>
-      	
+       <CircularInput
+          value={stepValue(value)}
+          onChange={v => updateValue(stepValue(v))}
+        >
+          <CircularTrack />
+          <CircularProgress />
+          <CircularThumb />
+
+          <text x={200} y={100} textAnchor="middle" dy="0.3em" fontWeight="bold">
+            Value: {value}
+            _PrevValue: {prevValue} 
+            _SumValue: {stepValue(sumValue*10)}  
+            _Display: {stepValue(value*10)} 
+          </text>
+        </CircularInput>
         <Button variant="contained" color="primary">
           Bank!
         </Button>
