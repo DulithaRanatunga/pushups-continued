@@ -39,7 +39,7 @@ const columns: GridColDef[] = [
         sortable: false,
         width: 200,
         valueGetter: (params: GridValueGetterParams) =>
-            `${params.row.count >= params.row.goal ? 'You legend!' : 'You can do it!'}`,
+            `${params.row.count >= params.row.goal ? ':D:D:D:D' : ':('}`,
     },
 ];
 

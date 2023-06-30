@@ -1,5 +1,5 @@
 import { Button, Typography, Box, Stack } from '@mui/material';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
     CircularInput,
     CircularTrack,
@@ -12,8 +12,10 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import {
     createBank as createBankMutation,
+    updateBank as updateBankMutation,
     deleteBank as deleteBankMutation,
 } from "../graphql/mutations";
+import { listBanks } from "../graphql/queries";
 import { API } from "aws-amplify";
 
 
@@ -42,7 +44,29 @@ function Bank() {
     const [prevStep, setPrevStep] = useState(0); // Previous Step
     const [sumValue, setSumValue] = useState(0);   // Current Step
     const [date, setDate] = useState<Dayjs>(dayjs());   // Current Step
+    const [banked, setBanked] = useState(0); // Raw Value used in Slider
+    const [storedBanks, setStoredBanks] = useState<any>({});
     const stepValue = (v: number) => Math.round(v * 10) / 10
+
+    useEffect(() => {
+        fetchBanks();
+    }, []);
+
+
+    async function fetchBanks() {
+        const apiData: any = await API.graphql({ query: listBanks });
+        const BanksFromAPI = apiData.data.listBanks.items;
+        const stored = {};
+        BanksFromAPI.forEach(bank => {
+            stored[bank.date] = bank;
+        });
+        setStoredBanks(stored);
+        if (!!stored[getFormattedDate(date)]) {
+            setBanked(stored[getFormattedDate(date)].count);
+        } else {
+            setBanked(0);
+        }
+    }
 
     function updateValue(newVal: number) {
 
@@ -73,15 +97,14 @@ function Bank() {
 
 
     function getGoal() {
-        // Goal is a function of Date
-        return cyrb53(getDate());
+        return cyrb53(getFormattedDate(date));
     }
 
 
-    async function addBank() {
+    async function addBank(intToBank, dateToAdd) {
         const data = {
-            date: getDate(),
-            count: getBankValue(),
+            date: dateToAdd,
+            count: intToBank,
         };
         await API.graphql({
             query: createBankMutation,
@@ -89,14 +112,65 @@ function Bank() {
         });
     }
 
-    function bank() {
-        var intToBank = getBankValue();
-        var getSelectedDate = getDate();
-        addBank();
+    async function updateBank(objToUpdate, countToAdd) {
+        objToUpdate.count += countToAdd;
+        if (objToUpdate.count <= 0) {
+            await API.graphql({
+                query: deleteBankMutation,
+                variables: { input: { id: objToUpdate.id } },
+            })
+            storedBanks[objToUpdate.date] = undefined;
+            setStoredBanks(storedBanks);
+        } else {    
+            const data = {
+                id: objToUpdate.id,
+                count: objToUpdate.count,
+            };
+            await API.graphql({
+                query: updateBankMutation,
+                variables: { input: data },
+            });
+        }
     }
 
-    function getDate() {
+    async function bank() {
+        var intToBank = getBankValue();
+        var getSelectedDate = getFormattedDate(date);
+        if (!!storedBanks[getSelectedDate]) {
+            await updateBank(storedBanks[getSelectedDate], intToBank);
+        } else {
+            await addBank(intToBank, getSelectedDate);
+        }
+        reset();
+    }
+
+    function reset() {
+        setValue(0);
+        setPrevStep(0);
+        setSumValue(0);
+        fetchBanks();
+    }
+
+    async function removeBank() {
+        var intToBank = -1 * getBankValue();
+        var getSelectedDate = getFormattedDate(date);
+        if (!!storedBanks[getSelectedDate]) {
+            await updateBank(storedBanks[getSelectedDate], intToBank);
+        }
+        reset();
+    }
+
+    function getFormattedDate(date) {
         return date.format('DD/MM/YYYY');
+    }
+
+    function updateDate(newDate) {
+        setDate(newDate || dayjs());
+        if (!!storedBanks[getFormattedDate(newDate)]) {
+            setBanked(storedBanks[getFormattedDate(newDate)].count);
+        } else {
+            setBanked(0);
+        }
     }
 
 
@@ -108,9 +182,10 @@ function Bank() {
                         label="Choose Date"
                         format="DD/MM/YYYY"
                         value={date}
-                        onChange={newDate => setDate(newDate || dayjs())}
+                        onChange={newDate => updateDate(newDate)}
                     /> </LocalizationProvider>
             </Box>
+            <Typography variant="h3"> Banked: {banked}</Typography>
             <Typography variant="h3"> Todays Goal: {getGoal()}</Typography>
             <CircularInput
                 value={stepValue(value)}
@@ -127,7 +202,7 @@ function Bank() {
             <Button variant="contained" color="primary" onClick={() => { bank() }}>
                 Bank!
             </Button>
-            <Button variant="contained" color="secondary">
+            <Button variant="contained" color="secondary" onClick={() => { removeBank() }}>
                 Remove
             </Button>
         </Stack>
