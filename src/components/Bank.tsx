@@ -16,6 +16,26 @@ import {
 } from "../graphql/mutations";
 import { API } from "aws-amplify";
 
+
+const MIN_GOAL = 80
+const MAX_GOAL = 80;
+
+// From: https://stackoverflow.com/a/52171480
+export function cyrb53(str: String, seed = 0) {
+    let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
+    for (let i = 0, ch; i < str.length; i++) {
+        ch = str.charCodeAt(i);
+        h1 = Math.imul(h1 ^ ch, 2654435761);
+        h2 = Math.imul(h2 ^ ch, 1597334677);
+    }
+    h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507);
+    h1 ^= Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+    h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507);
+    h2 ^= Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+
+    return (4294967296 * (2097151 & h2) + (h1 >>> 0)) % MAX_GOAL + MIN_GOAL;
+}
+
 function Bank() {
     //   const classes = useStyles();
     const [value, setValue] = useState(0); // Raw Value used in Slider
@@ -52,6 +72,12 @@ function Bank() {
     }
 
 
+    function getGoal() {
+        // Goal is a function of Date
+        return cyrb53(getDate());
+    }
+
+
     async function addBank() {
         const data = {
             date: getDate(),
@@ -73,26 +99,6 @@ function Bank() {
         return date.format('DD/MM/YYYY');
     }
 
-    function getGoal() {
-        // Goal is a function of Date
-        return cyrb53(getDate()) % 80 + 80;
-    }
-
-    // From: https://stackoverflow.com/a/52171480
-    function cyrb53(str: String, seed = 0) {
-        let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
-        for (let i = 0, ch; i < str.length; i++) {
-            ch = str.charCodeAt(i);
-            h1 = Math.imul(h1 ^ ch, 2654435761);
-            h2 = Math.imul(h2 ^ ch, 1597334677);
-        }
-        h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507);
-        h1 ^= Math.imul(h2 ^ (h2 >>> 13), 3266489909);
-        h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507);
-        h2 ^= Math.imul(h1 ^ (h1 >>> 13), 3266489909);
-
-        return 4294967296 * (2097151 & h2) + (h1 >>> 0);
-    }
 
     return (
         <Stack spacing={2} alignItems="center">
