@@ -11,11 +11,6 @@ import {
   View,
   withAuthenticator,
 } from "@aws-amplify/ui-react";
-import { listNotes } from "./graphql/queries";
-import {
-  createNote as createNoteMutation,
-  deleteNote as deleteNoteMutation,
-} from "./graphql/mutations";
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
@@ -57,43 +52,7 @@ function a11yProps(index: number) {
   };
 }
 
-const App = ({ signOut }: any) => {
-  const [notes, setNotes] = useState([]);
-
-  useEffect(() => {
-    fetchNotes();
-  }, []);
-
-  async function fetchNotes() {
-    const apiData:any = await API.graphql({ query: listNotes });
-    const notesFromAPI = apiData.data.listNotes.items;
-    setNotes(notesFromAPI);
-  }
-
-  async function createNote(event:any) {
-    event.preventDefault();
-    const form = new FormData(event.target);
-    const data = {
-      name: form.get("name"),
-      description: form.get("description"),
-    };
-    await API.graphql({
-      query: createNoteMutation,
-      variables: { input: data },
-    });
-    fetchNotes();
-    event.target.reset();
-  }
-
-  async function deleteNote({ id }:any) {
-    const newNotes = notes.filter((note: any) => note.id !== id);
-    setNotes(newNotes);
-    await API.graphql({
-      query: deleteNoteMutation,
-      variables: { input: { id } },
-    });
-  }
-
+const App = ({ signOut, user }: any) => { 
   const [value, setValue] = React.useState(0);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -103,6 +62,7 @@ const App = ({ signOut }: any) => {
   return (
     <View className="App">
       <Heading level={1}>Push/Squat/Sit Up</Heading>
+      <Heading level={2}>Hello {user.username} </Heading>
       <Box sx={{ width: '100%' }}>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">

@@ -16,7 +16,7 @@ import {
     deleteBank as deleteBankMutation,
 } from "../graphql/mutations";
 import { listBanks } from "../graphql/queries";
-import { API } from "aws-amplify";
+import { API, graphqlOperation } from "aws-amplify";
 
 
 const MIN_GOAL = 80
@@ -106,10 +106,9 @@ function Bank() {
             date: dateToAdd,
             count: intToBank,
         };
-        await API.graphql({
-            query: createBankMutation,
-            variables: { input: data },
-        });
+        await API.graphql(graphqlOperation(createBankMutation,
+            { input: data },
+        ));
     }
 
     async function updateBank(objToUpdate, countToAdd) {
