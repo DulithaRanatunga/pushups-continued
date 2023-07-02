@@ -4,14 +4,17 @@
     "apiName": "pushupscontinued",
     "serviceName": "AppSync",
     "defaultAuthType": {
-      "mode": "API_KEY",
-      "expirationTime": 7
+      "mode": "AMAZON_COGNITO_USER_POOLS",
+      "cognitoUserPoolId": "authpushupscontinued86c1f52d"
     },
     "additionalAuthTypes": [
       {
-        "mode": "AMAZON_COGNITO_USER_POOLS",
-        "cognitoUserPoolId": "authpushupscontinued86c1f52d"
+        "mode": "API_KEY",
+        "expirationTime": 7,
+        "apiKeyExpirationDate": "2023-07-09T11:17:26.205Z",
+        "keyDescription": "dulitha 1p api key"
       }
-    ]
+    ],
+    "conflictResolution": {}
   }
 }
