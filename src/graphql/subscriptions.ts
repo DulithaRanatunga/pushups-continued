@@ -2,48 +2,16 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
-export const onCreateNote = /* GraphQL */ `
-  subscription OnCreateNote($filter: ModelSubscriptionNoteFilterInput) {
-    onCreateNote(filter: $filter) {
-      id
-      name
-      description
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const onUpdateNote = /* GraphQL */ `
-  subscription OnUpdateNote($filter: ModelSubscriptionNoteFilterInput) {
-    onUpdateNote(filter: $filter) {
-      id
-      name
-      description
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const onDeleteNote = /* GraphQL */ `
-  subscription OnDeleteNote($filter: ModelSubscriptionNoteFilterInput) {
-    onDeleteNote(filter: $filter) {
-      id
-      name
-      description
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
 export const onCreateBank = /* GraphQL */ `
-  subscription OnCreateBank($filter: ModelSubscriptionBankFilterInput) {
-    onCreateBank(filter: $filter) {
+  subscription OnCreateBank(
+    $filter: ModelSubscriptionBankFilterInput
+    $owner: String
+  ) {
+    onCreateBank(filter: $filter, owner: $owner) {
       id
       date
       count
+      owner
       createdAt
       updatedAt
       __typename
@@ -51,11 +19,15 @@ export const onCreateBank = /* GraphQL */ `
   }
 `;
 export const onUpdateBank = /* GraphQL */ `
-  subscription OnUpdateBank($filter: ModelSubscriptionBankFilterInput) {
-    onUpdateBank(filter: $filter) {
+  subscription OnUpdateBank(
+    $filter: ModelSubscriptionBankFilterInput
+    $owner: String
+  ) {
+    onUpdateBank(filter: $filter, owner: $owner) {
       id
       date
       count
+      owner
       createdAt
       updatedAt
       __typename
@@ -63,11 +35,15 @@ export const onUpdateBank = /* GraphQL */ `
   }
 `;
 export const onDeleteBank = /* GraphQL */ `
-  subscription OnDeleteBank($filter: ModelSubscriptionBankFilterInput) {
-    onDeleteBank(filter: $filter) {
+  subscription OnDeleteBank(
+    $filter: ModelSubscriptionBankFilterInput
+    $owner: String
+  ) {
+    onDeleteBank(filter: $filter, owner: $owner) {
       id
       date
       count
+      owner
       createdAt
       updatedAt
       __typename
