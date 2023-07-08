@@ -9,27 +9,26 @@ const columns: GridColDef[] = [
     {
         field: 'date',
         headerName: 'Date',
-        width: 150,
         editable: true,
     },
     {
         field: 'count',
         headerName: 'Banked',
-        width: 100,
-        editable: true,
+        editable: false,
+        width: 70,
     },
     {
         field: 'goal',
         headerName: 'Goal',
         type: 'number',
-        width: 110,
+        width: 70,
         editable: true,
     },
     {
         field: 'percent',
         headerName: '%',
         sortable: false,
-        width: 100,
+        width: 40,
         valueGetter: (params: GridValueGetterParams) =>
             `${Math.round(((params.row.count || 0) / params.row.goal) * 100)}`,
     },
@@ -37,9 +36,9 @@ const columns: GridColDef[] = [
         field: 'message',
         headerName: '',
         sortable: false,
-        width: 200,
+        width: 40,
         valueGetter: (params: GridValueGetterParams) =>
-            `${params.row.count >= params.row.goal ? ':D:D:D:D' : ':('}`,
+            `${params.row.count >= params.row.goal ? ':D' : ':('}`,
     },
 ];
 
@@ -69,6 +68,7 @@ function Stats() {
                 <DataGrid
                     rows={banks}
                     columns={columns}
+                    columnThreshold={1}
                     initialState={{
                         pagination: {
                             paginationModel: {
@@ -81,6 +81,7 @@ function Stats() {
                     }}
                     pageSizeOptions={[5]}
                     disableRowSelectionOnClick
+                    disableColumnMenu
                 />
             </Box>
 

@@ -36,3 +36,35 @@ export const listBanks = /* GraphQL */ `
     }
   }
 `;
+export const getLeaderboard = /* GraphQL */ `
+  query GetLeaderboard($id: ID!) {
+    getLeaderboard(id: $id) {
+      id
+      user
+      count
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const listLeaderboards = /* GraphQL */ `
+  query ListLeaderboards(
+    $filter: ModelLeaderboardFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listLeaderboards(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        user
+        count
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;

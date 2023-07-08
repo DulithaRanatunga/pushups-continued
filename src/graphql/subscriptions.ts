@@ -50,3 +50,45 @@ export const onDeleteBank = /* GraphQL */ `
     }
   }
 `;
+export const onCreateLeaderboard = /* GraphQL */ `
+  subscription OnCreateLeaderboard(
+    $filter: ModelSubscriptionLeaderboardFilterInput
+  ) {
+    onCreateLeaderboard(filter: $filter) {
+      id
+      user
+      count
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onUpdateLeaderboard = /* GraphQL */ `
+  subscription OnUpdateLeaderboard(
+    $filter: ModelSubscriptionLeaderboardFilterInput
+  ) {
+    onUpdateLeaderboard(filter: $filter) {
+      id
+      user
+      count
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onDeleteLeaderboard = /* GraphQL */ `
+  subscription OnDeleteLeaderboard(
+    $filter: ModelSubscriptionLeaderboardFilterInput
+  ) {
+    onDeleteLeaderboard(filter: $filter) {
+      id
+      user
+      count
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;

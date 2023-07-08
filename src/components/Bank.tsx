@@ -14,8 +14,11 @@ import {
     createBank as createBankMutation,
     updateBank as updateBankMutation,
     deleteBank as deleteBankMutation,
+    createLeaderboard as createLeaderboardMutation,
+    updateLeaderboard as updateLeaderboardMutation,
+    deleteLeaderboard,
 } from "../graphql/mutations";
-import { listBanks } from "../graphql/queries";
+import { listBanks, listLeaderboards } from "../graphql/queries";
 import { API, graphqlOperation } from "aws-amplify";
 
 
@@ -38,7 +41,7 @@ export function cyrb53(str: String, seed = 0) {
     return (4294967296 * (2097151 & h2) + (h1 >>> 0)) % MAX_GOAL + MIN_GOAL;
 }
 
-function Bank() {
+function Bank(props: { user }) {
     //   const classes = useStyles();
     const [value, setValue] = useState(0); // Raw Value used in Slider
     const [prevStep, setPrevStep] = useState(0); // Previous Step
@@ -57,9 +60,25 @@ function Bank() {
         const apiData: any = await API.graphql({ query: listBanks });
         const BanksFromAPI = apiData.data.listBanks.items;
         const stored = {};
+        var totalBanked = 0;
         BanksFromAPI.forEach(bank => {
+            if (stored[bank.date] != undefined) {
+                // If somehow we already have duplicate
+                // delete the smaller one.
+                console.log("Duplicate detected on " + bank.date)
+                if (bank.count > stored[bank.count]) {
+                    // Delete stored one.
+                    // updateBank(stored[bank.date], (-1*stored[bank.date].count)-1);
+                } else {
+                    // Delete this entry
+                    // updateBank(bank, (-1*bank.count)-1)                    
+                    return;
+                }
+            }
             stored[bank.date] = bank;
+            totalBanked += bank.count;
         });
+        updateLeaderboard(totalBanked);
         setStoredBanks(stored);
         if (!!stored[getFormattedDate(date)]) {
             setBanked(stored[getFormattedDate(date)].count);
@@ -150,15 +169,6 @@ function Bank() {
         fetchBanks();
     }
 
-    async function removeBank() {
-        var intToBank = -1 * getBankValue();
-        var getSelectedDate = getFormattedDate(date);
-        if (!!storedBanks[getSelectedDate]) {
-            await updateBank(storedBanks[getSelectedDate], intToBank);
-        }
-        reset();
-    }
-
     function getFormattedDate(date) {
         return date.format('DD/MM/YYYY');
     }
@@ -172,6 +182,47 @@ function Bank() {
         }
     }
 
+    async function updateLeaderboard(totalBanked) {        
+        console.log("Total:" + totalBanked + " for user: " + props.user.username);
+        const currentLeaderboardsForMe: any = await API.graphql(graphqlOperation(listLeaderboards, {
+            filter: {
+                user: {
+                    eq: props.user.username
+                }
+            }
+        }));
+        var existingLeaderboards = currentLeaderboardsForMe.data.listLeaderboards.items;
+        if (existingLeaderboards.length > 1) {
+            // Just delete them all.
+            existingLeaderboards.forEach(existing => {
+                API.graphql(graphqlOperation(deleteLeaderboard,
+                    { input: { id: existing.id }},
+                ));
+            })
+
+            existingLeaderboards = [];
+        }
+        if (existingLeaderboards.length > 0) {
+            console.log("updating existing: " + existingLeaderboards);
+            // Update existing
+            await API.graphql(graphqlOperation(updateLeaderboardMutation,
+                { input: {
+                    id: existingLeaderboards[0].id,
+                    user: props.user.username,
+                    count: totalBanked
+                } },
+            ));
+        } else {
+            console.log("creating new");
+            // Create new one
+            await API.graphql(graphqlOperation(createLeaderboardMutation,
+                { input: {
+                    user: props.user.username,
+                    count: totalBanked,
+                }},
+            ));
+        }
+    }
 
     return (
         <Stack spacing={2} alignItems="center">
@@ -200,9 +251,6 @@ function Bank() {
             </CircularInput>
             <Button variant="contained" color="primary" onClick={() => { bank() }}>
                 Bank!
-            </Button>
-            <Button variant="contained" color="secondary" onClick={() => { removeBank() }}>
-                Remove
             </Button>
         </Stack>
     );

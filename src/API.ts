@@ -91,6 +91,39 @@ export type DeleteBankInput = {
   id: string,
 };
 
+export type CreateLeaderboardInput = {
+  id?: string | null,
+  user: string,
+  count: number,
+};
+
+export type ModelLeaderboardConditionInput = {
+  user?: ModelStringInput | null,
+  count?: ModelIntInput | null,
+  and?: Array< ModelLeaderboardConditionInput | null > | null,
+  or?: Array< ModelLeaderboardConditionInput | null > | null,
+  not?: ModelLeaderboardConditionInput | null,
+};
+
+export type Leaderboard = {
+  __typename: "Leaderboard",
+  id: string,
+  user: string,
+  count: number,
+  createdAt: string,
+  updatedAt: string,
+};
+
+export type UpdateLeaderboardInput = {
+  id: string,
+  user?: string | null,
+  count?: number | null,
+};
+
+export type DeleteLeaderboardInput = {
+  id: string,
+};
+
 export type ModelBankFilterInput = {
   id?: ModelIDInput | null,
   date?: ModelStringInput | null,
@@ -120,6 +153,21 @@ export type ModelIDInput = {
 export type ModelBankConnection = {
   __typename: "ModelBankConnection",
   items:  Array<Bank | null >,
+  nextToken?: string | null,
+};
+
+export type ModelLeaderboardFilterInput = {
+  id?: ModelIDInput | null,
+  user?: ModelStringInput | null,
+  count?: ModelIntInput | null,
+  and?: Array< ModelLeaderboardFilterInput | null > | null,
+  or?: Array< ModelLeaderboardFilterInput | null > | null,
+  not?: ModelLeaderboardFilterInput | null,
+};
+
+export type ModelLeaderboardConnection = {
+  __typename: "ModelLeaderboardConnection",
+  items:  Array<Leaderboard | null >,
   nextToken?: string | null,
 };
 
@@ -173,6 +221,14 @@ export type ModelSubscriptionIntInput = {
   notIn?: Array< number | null > | null,
 };
 
+export type ModelSubscriptionLeaderboardFilterInput = {
+  id?: ModelSubscriptionIDInput | null,
+  user?: ModelSubscriptionStringInput | null,
+  count?: ModelSubscriptionIntInput | null,
+  and?: Array< ModelSubscriptionLeaderboardFilterInput | null > | null,
+  or?: Array< ModelSubscriptionLeaderboardFilterInput | null > | null,
+};
+
 export type CreateBankMutationVariables = {
   input: CreateBankInput,
   condition?: ModelBankConditionInput | null,
@@ -224,6 +280,54 @@ export type DeleteBankMutation = {
   } | null,
 };
 
+export type CreateLeaderboardMutationVariables = {
+  input: CreateLeaderboardInput,
+  condition?: ModelLeaderboardConditionInput | null,
+};
+
+export type CreateLeaderboardMutation = {
+  createLeaderboard?:  {
+    __typename: "Leaderboard",
+    id: string,
+    user: string,
+    count: number,
+    createdAt: string,
+    updatedAt: string,
+  } | null,
+};
+
+export type UpdateLeaderboardMutationVariables = {
+  input: UpdateLeaderboardInput,
+  condition?: ModelLeaderboardConditionInput | null,
+};
+
+export type UpdateLeaderboardMutation = {
+  updateLeaderboard?:  {
+    __typename: "Leaderboard",
+    id: string,
+    user: string,
+    count: number,
+    createdAt: string,
+    updatedAt: string,
+  } | null,
+};
+
+export type DeleteLeaderboardMutationVariables = {
+  input: DeleteLeaderboardInput,
+  condition?: ModelLeaderboardConditionInput | null,
+};
+
+export type DeleteLeaderboardMutation = {
+  deleteLeaderboard?:  {
+    __typename: "Leaderboard",
+    id: string,
+    user: string,
+    count: number,
+    createdAt: string,
+    updatedAt: string,
+  } | null,
+};
+
 export type GetBankQueryVariables = {
   id: string,
 };
@@ -255,6 +359,42 @@ export type ListBanksQuery = {
       date: string,
       count: number,
       owner?: string | null,
+      createdAt: string,
+      updatedAt: string,
+    } | null >,
+    nextToken?: string | null,
+  } | null,
+};
+
+export type GetLeaderboardQueryVariables = {
+  id: string,
+};
+
+export type GetLeaderboardQuery = {
+  getLeaderboard?:  {
+    __typename: "Leaderboard",
+    id: string,
+    user: string,
+    count: number,
+    createdAt: string,
+    updatedAt: string,
+  } | null,
+};
+
+export type ListLeaderboardsQueryVariables = {
+  filter?: ModelLeaderboardFilterInput | null,
+  limit?: number | null,
+  nextToken?: string | null,
+};
+
+export type ListLeaderboardsQuery = {
+  listLeaderboards?:  {
+    __typename: "ModelLeaderboardConnection",
+    items:  Array< {
+      __typename: "Leaderboard",
+      id: string,
+      user: string,
+      count: number,
       createdAt: string,
       updatedAt: string,
     } | null >,
@@ -308,6 +448,51 @@ export type OnDeleteBankSubscription = {
     date: string,
     count: number,
     owner?: string | null,
+    createdAt: string,
+    updatedAt: string,
+  } | null,
+};
+
+export type OnCreateLeaderboardSubscriptionVariables = {
+  filter?: ModelSubscriptionLeaderboardFilterInput | null,
+};
+
+export type OnCreateLeaderboardSubscription = {
+  onCreateLeaderboard?:  {
+    __typename: "Leaderboard",
+    id: string,
+    user: string,
+    count: number,
+    createdAt: string,
+    updatedAt: string,
+  } | null,
+};
+
+export type OnUpdateLeaderboardSubscriptionVariables = {
+  filter?: ModelSubscriptionLeaderboardFilterInput | null,
+};
+
+export type OnUpdateLeaderboardSubscription = {
+  onUpdateLeaderboard?:  {
+    __typename: "Leaderboard",
+    id: string,
+    user: string,
+    count: number,
+    createdAt: string,
+    updatedAt: string,
+  } | null,
+};
+
+export type OnDeleteLeaderboardSubscriptionVariables = {
+  filter?: ModelSubscriptionLeaderboardFilterInput | null,
+};
+
+export type OnDeleteLeaderboardSubscription = {
+  onDeleteLeaderboard?:  {
+    __typename: "Leaderboard",
+    id: string,
+    user: string,
+    count: number,
     createdAt: string,
     updatedAt: string,
   } | null,

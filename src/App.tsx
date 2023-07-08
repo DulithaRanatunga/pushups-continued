@@ -1,13 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import "./App.css";
 import "@aws-amplify/ui-react/styles.css";
-import { API } from "aws-amplify";
 import {
   Button,
-  Flex,
   Heading,
-  Text,
-  TextField,
   View,
   withAuthenticator,
 } from "@aws-amplify/ui-react";
@@ -17,6 +13,7 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Bank from './components/Bank';
 import Stats from './components/Stats';
+import Leaderboard from './components/Leaderboard';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -52,7 +49,7 @@ function a11yProps(index: number) {
   };
 }
 
-const App = ({ signOut, user }: any) => { 
+const App = ({ signOut, user }: any) => {
   const [value, setValue] = React.useState(0);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -64,19 +61,23 @@ const App = ({ signOut, user }: any) => {
       <Heading level={1}>Push/Squat/Sit Up</Heading>
       <Heading level={2}>Hello {user.username} </Heading>
       <Box sx={{ width: '100%' }}>
-      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
-          <Tab label="Bank" {...a11yProps(0)} />
-          <Tab label="Stats" {...a11yProps(1)} />
-        </Tabs>
+        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+          <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
+            <Tab label="Bank" {...a11yProps(0)} />
+            <Tab label="Stats" {...a11yProps(1)} />
+            <Tab label="Everyone" {...a11yProps(2)} />
+          </Tabs>
+        </Box>
+        <TabPanel value={value} index={0}>
+          <Bank user={user}/>
+        </TabPanel>
+        <TabPanel value={value} index={1}>
+          <Stats />
+        </TabPanel>
+        <TabPanel value={value} index={2}>
+          <Leaderboard />
+        </TabPanel>
       </Box>
-      <TabPanel value={value} index={0}>
-        <Bank />
-      </TabPanel>
-      <TabPanel value={value} index={1}>
-        <Stats />
-      </TabPanel>
-    </Box>
       <Button onClick={signOut}>Sign Out</Button>
     </View>
   );

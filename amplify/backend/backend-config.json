@@ -20,6 +20,9 @@
                 "description": "dulitha 1p api key"
               },
               "authenticationType": "API_KEY"
+            },
+            {
+              "authenticationType": "AWS_IAM"
             }
           ],
           "defaultAuthentication": {

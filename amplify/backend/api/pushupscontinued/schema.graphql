@@ -7,3 +7,9 @@ type Bank @model @auth(rules: [
   count: Int!
   owner: String @auth(rules: [{ allow: owner, operations: [read, delete] }])
 }
+
+type Leaderboard @model @auth(rules: [{ allow: private, provider: userPools }]) {
+  id: ID!
+  user: String!
+  count: Int!
+}
