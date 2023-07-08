@@ -75,6 +75,9 @@ function Stats() {
                                 pageSize: 5,
                             },
                         },
+                        sorting: {
+                            sortModel: [{ field: 'date', sort: 'desc'}]
+                        }
                     }}
                     pageSizeOptions={[5]}
                     disableRowSelectionOnClick
