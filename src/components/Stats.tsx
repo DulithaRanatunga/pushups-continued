@@ -4,6 +4,7 @@ import { API } from "aws-amplify";
 import { useEffect, useState } from 'react';
 import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
 import { cyrb53 } from './Bank'; 
+import dayjs, { Dayjs } from 'dayjs';
 
 const columns: GridColDef[] = [
     {
@@ -13,15 +14,15 @@ const columns: GridColDef[] = [
     },
     {
         field: 'count',
-        headerName: 'Banked',
+        headerName: 'Done',
         editable: false,
-        width: 70,
+        width: 55,
     },
     {
         field: 'goal',
         headerName: 'Goal',
         type: 'number',
-        width: 70,
+        width: 55,
         editable: true,
     },
     {
@@ -53,33 +54,81 @@ function Stats() {
     async function fetchBanks() {
         const apiData: any = await API.graphql({ query: listBanks });
         const BanksFromAPI = apiData.data.listBanks.items;
-        setBanks(BanksFromAPI.map((bank: any) => {
+        setBanks(organiseBanks(BanksFromAPI.map((bank: any) => {
             return {
                 goal: cyrb53(bank.date),
                 ...bank
             }
-        }));
+        })));
+    }
+
+    function organiseBanks(banks: any[]): any[] {
+        // Get first day of banks
+        // For days since that bank, add 0 or from Map
+        const first = convertDatesAndGetFirst(banks);
+        var banksToDisplay: any[] = [];
+        var it = dayjs(first.dayJsDate);
+        const today = dayjs();
+        while (it.isBefore(today)) {
+            banksToDisplay.push(banks.find(d => it.isSame(d.dayJsDate)) || emptyBank(it));
+            it = it.add(1, 'day');
+            console.log('Looping: ' + it.toDate());
+        }
+        return banksToDisplay;
+    }
+
+    function emptyBank(date: Dayjs): any {
+        var formatted = date.format('DD/MM/YYYY');
+        return {
+            count: 0,
+            createdAt: null,
+            date: formatted,
+            dayJsDate: dayjs(date),
+            goal: cyrb53(formatted),
+            id: formatted,
+            owner: null,
+            updatedAt: null
+        };
+    }
+
+    // Gets first bank, poplating dayJsDate while at it.
+    function convertDatesAndGetFirst(banks: any[]): any {
+        var first: any = undefined;
+        banks.forEach(bank => {
+            if (!first) { 
+                first = bank;
+            }
+            bank.dayJsDate = dayJsDate(bank.date);
+            if (bank.dayJsDate.isBefore(first?.dayJsDate)) {
+                first = bank;                                
+            }
+        })
+        return first;
+    }
+    
+    function dayJsDate(stringDate): Dayjs {
+        return dayjs(stringDate, "DD/MM/YYYY");
     }
 
     return (
         <Box>
             <Typography variant="h3"> History </Typography>
-            <Box sx={{ height: 400, width: '100%' }}>
+            <Box sx={{ height: '100%', width: '100%' }}>
                 <DataGrid
                     rows={banks}
                     columns={columns}
                     columnThreshold={1}
                     initialState={{
-                        pagination: {
-                            paginationModel: {
-                                pageSize: 5,
-                            },
-                        },
+                        // pagination: {
+                        //     paginationModel: {
+                        //         pageSize: 5,
+                        //     },
+                        // },
                         sorting: {
                             sortModel: [{ field: 'date', sort: 'desc'}]
                         }
                     }}
-                    pageSizeOptions={[5]}
+                    // pageSizeOptions={[5]}
                     disableRowSelectionOnClick
                     disableColumnMenu
                 />
