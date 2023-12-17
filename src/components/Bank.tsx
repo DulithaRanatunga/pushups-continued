@@ -18,8 +18,9 @@ import {
     updateLeaderboard as updateLeaderboardMutation,
     deleteLeaderboard,
 } from "../graphql/mutations";
-import { listBanks, listLeaderboards } from "../graphql/queries";
+import { listLeaderboards } from "../graphql/queries";
 import { API, graphqlOperation } from "aws-amplify";
+import { fetchAllBanks } from '../ApiHelper';
 
 
 const MIN_GOAL = 80
@@ -56,9 +57,8 @@ function Bank(props: { user }) {
     }, []);
 
 
-    async function fetchBanks() {
-        const apiData: any = await API.graphql({ query: listBanks });
-        const BanksFromAPI = apiData.data.listBanks.items;
+    async function fetchBanks() {        
+        const BanksFromAPI = await fetchAllBanks();
         const stored = {};
         var totalBanked = 0;
         BanksFromAPI.forEach(bank => {
@@ -71,7 +71,7 @@ function Bank(props: { user }) {
                     // updateBank(stored[bank.date], (-1*stored[bank.date].count)-1);
                 } else {
                     // Delete this entry
-                    // updateBank(bank, (-1*bank.count)-1)                    
+                    // updateBank(bank, (-1*bank.count)-1)
                     return;
                 }
             }

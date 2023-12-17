@@ -1,11 +1,10 @@
 import { Typography, Box } from '@mui/material';
-import { listBanks } from "../graphql/queries";
-import { API } from "aws-amplify";
 import { useEffect, useState } from 'react';
 import { DataGrid, GridColDef, GridValueGetterParams, GridComparatorFn  } from '@mui/x-data-grid';
 import { cyrb53 } from './Bank'; 
 import dayjs, { Dayjs } from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
+import { fetchAllBanks } from '../ApiHelper';
 dayjs.extend(customParseFormat)
 
 const customDateComparator: GridComparatorFn<string> = (v1, v2) =>
@@ -49,17 +48,17 @@ const columns: GridColDef[] = [
     },
 ];
 
+
 function Stats() {
 
     const [banks, setBanks] = useState<any[]>([]);
 
     useEffect(() => {
         fetchBanks();
-    }, []);
+    }, []);    
 
     async function fetchBanks() {
-        const apiData: any = await API.graphql({ query: listBanks });
-        const BanksFromAPI = apiData.data.listBanks.items;
+        const BanksFromAPI  = await fetchAllBanks();        
         setBanks(organiseBanks(BanksFromAPI.map((bank: any) => {
             return {
                 goal: cyrb53(bank.date),
