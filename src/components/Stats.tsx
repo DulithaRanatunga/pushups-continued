@@ -2,15 +2,21 @@ import { Typography, Box } from '@mui/material';
 import { listBanks } from "../graphql/queries";
 import { API } from "aws-amplify";
 import { useEffect, useState } from 'react';
-import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
+import { DataGrid, GridColDef, GridValueGetterParams, GridComparatorFn  } from '@mui/x-data-grid';
 import { cyrb53 } from './Bank'; 
 import dayjs, { Dayjs } from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+dayjs.extend(customParseFormat)
+
+const customDateComparator: GridComparatorFn<string> = (v1, v2) =>
+    dayjs(v1, 'DD/MM/YYYY', true).toDate().getTime() - dayjs(v2, 'DD/MM/YYYY', true).toDate().getTime();
 
 const columns: GridColDef[] = [
     {
         field: 'date',
         headerName: 'Date',
-        editable: true,
+        editable: false,
+        sortComparator: customDateComparator,
     },
     {
         field: 'count',
@@ -23,7 +29,7 @@ const columns: GridColDef[] = [
         headerName: 'Goal',
         type: 'number',
         width: 55,
-        editable: true,
+        editable: false,
     },
     {
         field: 'percent',
@@ -72,7 +78,6 @@ function Stats() {
         while (it.isBefore(today)) {
             banksToDisplay.push(banks.find(d => it.isSame(d.dayJsDate)) || emptyBank(it));
             it = it.add(1, 'day');
-            console.log('Looping: ' + it.toDate());
         }
         return banksToDisplay;
     }
