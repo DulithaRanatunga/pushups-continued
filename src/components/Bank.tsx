@@ -65,18 +65,26 @@ function Bank(props: { user }) {
             if (stored[bank.date] != undefined) {
                 // If somehow we already have duplicate
                 // delete the smaller one.
-                console.log("Duplicate detected on " + bank.date)
-                if (bank.count > stored[bank.count]) {
+                // console.log("Duplicate detected on " + bank.date)
+                // console.log("First: ", bank.count)
+                // console.log("Second: ", stored[bank.date].count)
+                if (bank.count > stored[bank.date].count) {
+                    stored[bank.date] = bank;
+                    // Only add the diff
+                    var toAdd = bank.count - stored[bank.date].count;
+                    // console.log("added: " + toAdd);
+                    totalBanked += toAdd;
                     // Delete stored one.
                     // updateBank(stored[bank.date], (-1*stored[bank.date].count)-1);
-                } else {
+                // } else {
                     // Delete this entry
                     // updateBank(bank, (-1*bank.count)-1)
-                    return;
+                    // return;
                 }
+            } else {
+                stored[bank.date] = bank;
+                totalBanked += bank.count;
             }
-            stored[bank.date] = bank;
-            totalBanked += bank.count;
         });
         updateLeaderboard(totalBanked);
         setStoredBanks(stored);

@@ -68,3 +68,9 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+
+### Amplify Console is not good at updating API keys. If things fail to deploy because of expired key, use this:
+https://github.com/aws-amplify/amplify-category-api/issues/636#issuecomment-1764996723
+
+# amplify push
